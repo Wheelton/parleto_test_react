@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Recruitment task</title>
+    <meta name="robots" content="noindex">
+    <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.24/browser.min.js"></script>
+  </head>
+  <body>
+    <div id="app">
+    </div>
+    <script type="text/babel">
+     
+      const workerList = 
+         [
+          { "firstName": "John", "lastName": "Smith", "department": "IT", "salary": { "amount": 3000, "currency": "USD" } },
+          { "firstName": "Jane", "lastName": "Doe", "department": "IT", "salary": { "amount": 3000.50, "currency": "USD" } },
+          { "firstName": "Bob", "lastName": "Colman", "department": "Sales", "salary": { "amount": 9000, "currency": "USD" } },
+          { "firstName": "Barbara", "lastName": "O'Connor", "department": "Sales", "salary": { "amount": 4000, "currency": "USD" } },
+          { "firstName": "Adam", "lastName": "Murphy", "department": "Administration", "salary": { "amount": 2000, "currency": "USD" } }
+        ]
+      
+
+class TaskList extends React.Component {
+   constructor(){
+      super();
+      this.state = {
+        taskList: [
+          { 
+            "title": "Add form to add new worker",
+            "completed": true,
+            "subtaskList": [
+              { "title": "firstName", "completed": true },
+              { "title": "lastName", "completed": true },
+              { "title": "department", "completed": true },
+              { "title": "salary amount and currency", "completed": true }
+            ]
+          },
+          { 
+            "title": "Add search form", 
+            "completed": true,
+            "subtaskList": [
+              { "title": "person (text)", "completed": true },
+              { "title": "department (multiple choice)", "completed": false },
+              { "title": "salary (range)", "completed": true }
+            ]
+          },
+          { 
+            "title": "Add summary of salary per department", 
+            "completed": true
+          },
+          {
+            "title": "Other improvements (feel free to add other improvements)",
+            "completed": false
+          }
+        ]
+    }
+  }    
+  render() {
+    const  {taskList}  = this.state;
+    return (<ol>
+            {taskList.map((task, tIdx) => (
+              <li key={tIdx}>{task.title} { task.completed ? "✅" : "❌" }
+                  <ol type="a">
+                    {task.subtaskList && task.subtaskList.map((subtask, stIdx) => (<li key={stIdx}>{subtask.title} {subtask.completed ? "✅" : "❌"}</li>))}
+                  </ol> 
+              </li>
+            ))}
+          </ol>);
+  }
+}
+
+const WorkerList=()=>{
+  const salarySum = workerList.reduce((acc, i) => acc + i.salary.amount, 0);
+  const departmentList = []
+  workerList.forEach(element => {
+    departmentList.push(element.department)
+  });
+  let departments = departmentList.filter((v,i,a)=>a.indexOf(v)===i)
+  const depSum = []
+  departments.forEach(element=>{
+    let sum = 0
+    workerList.map((item)=>{
+      if(item.department==element)
+      {sum+=item.salary.amount}
+    })
+    depSum.push(sum)
+  })
+
+
+      const [list, setList] = React.useState(workerList)
+      const [list2, setList2] = React.useState(workerList)
+      const [formData, setFormData] = React.useState({
+        firstName: "", lastName:"", department:"", salary:"", currency:"" 
+      })
+      const [formData2, setFormData2] = React.useState({
+        firstName2: "", lastName2:"", department2:"", salary_min:"", salary_max:"" 
+      })
+      const [typeOfSearch, setTypeOfSearch] = React.useState('person')
+        function handleChange(event){
+        setFormData(prevFormData =>{
+          return{
+            ...prevFormData,
+            [event.target.name]: event.target.value
+          }
+        })
+      }
+      function handleAdd(){
+        function isEmpty(obj) {
+          let i = 0;
+          for (var key in obj) {
+              if (obj[key] == null || obj[key] == "")
+                  i++
+          }
+          if(i>0)
+          return true
+        }
+
+      if(!isEmpty(formData)){
+        workerList.push({ 
+          "firstName": formData.firstName, 
+          "lastName": formData.lastName, 
+          "department": formData.department, 
+          "salary": { "amount": parseFloat(formData.salary), 
+          "currency": formData.currency 
+        }})
+        setFormData({firstName: "", lastName:"",department:"",salary: "", currency: "" })
+        
+      }
+      else{
+        alert("Please write down all the information!")
+      }
+    }
+
+
+    
+
+
+    function handleSearch(){
+     let searchType = document.getElementById("searchType").value
+        if(searchType=='by_person')
+          {
+            setList2(workerList)
+            setTypeOfSearch('person')
+            document.getElementById('fN').style.visibility="visible"
+            document.getElementById('lN').style.visibility="visible"
+            document.getElementById('dp').style.visibility="hidden"
+            document.getElementById('sMin').style.visibility="hidden"
+            document.getElementById('sMax').style.visibility="hidden"
+            setFormData2({firstName2: "", lastName2:"", department2:"", salary_min:"", salary_max:"" })
+          }
+        if(searchType=='by_department')
+          {
+            setList2(workerList)
+            setTypeOfSearch('department')
+            document.getElementById('fN').style.visibility="hidden"
+            document.getElementById('lN').style.visibility="hidden"
+            document.getElementById('dp').style.visibility="visible"
+            document.getElementById('sMin').style.visibility="hidden"
+            document.getElementById('sMax').style.visibility="hidden"
+            setFormData2({firstName2: "", lastName2:"", department2:"", salary_min:"", salary_max:"" })
+          }
+        if(searchType=='by_salary')
+          {
+            setList2(workerList)
+            setTypeOfSearch('salary')
+            document.getElementById('fN').style.visibility="hidden"
+            document.getElementById('lN').style.visibility="hidden"
+            document.getElementById('dp').style.visibility="hidden"
+            document.getElementById('sMin').style.visibility="visible"
+            document.getElementById('sMax').style.visibility="visible"
+            setFormData2({firstName2: "", lastName2:"", department2:"", salary_min:"", salary_max:"" })
+          }
+    }
+        function handleChange2(event){
+          setList2(workerList)
+          setFormData2(prevFormData =>{
+          return{
+            ...prevFormData,
+            [event.target.name]: event.target.value
+          }
+            })}
+        function handleClick(){
+          if(typeOfSearch=='person'){
+            console.log(typeOfSearch)
+          var filtered = list2.filter(item => item.firstName==formData2.firstName2&&item.lastName==formData2.lastName2)
+          if(filtered==0)
+          {
+            alert("There is no such results, or your information is not correct!")
+          }
+           else{
+            setList2(filtered)
+          }
+          }
+          else if(typeOfSearch=='department'){
+            
+            var filtered = list2.filter(item => item.department==formData2.department2)
+          if(filtered==0)
+          {
+            alert("There is no such results, or your information is not correct!")
+          }
+           else{
+            setList2(filtered)
+          }
+          }
+          
+          else if(typeOfSearch=='salary'){
+            
+            var filtered = list2.filter(item => item.salary.amount>formData2.salary_min&&item.salary.amount<formData2.salary_max)
+          if(filtered==0)
+          {
+            alert("There is no such results, or your information is not correct!")
+          }
+           else{
+            setList2(filtered)
+          }
+          }
+        }
+        
+        const MapList = ({list}) =>(
+        list.map((worker, index) => (
+          <tr key={index}>
+            <td>{index+1}.</td>
+            <td>{worker.firstName}</td>
+            <td>{worker.lastName}</td>
+            <td>{worker.department}</td>
+            <td>{worker.salary.amount} {worker.salary.currency}</td>
+          </tr>
+        ))
+      )
+      
+      return(
+        <div style={{display: "flex", gap: "2em"}}>
+        <div>
+        <h2>Workers</h2>
+        <table border="1">
+        <tbody>
+        <MapList list={list}/>
+        </tbody>
+        <tfoot>
+        <tr>
+          <td><b>Department</b></td>
+          <td colSpan="4"><b>Salary</b></td>
+        </tr>
+        {departments.map((department, index)=>(
+        <tr>
+          <td>{department}</td>
+          <td colSpan="4">{depSum[index]} USD</td>
+        </tr>
+        ))}
+        <tr>
+          <td colSpan="3"></td>
+          <td>Summary</td>
+          <td>{salarySum} USD</td>
+        </tr>
+        </tfoot>
+        </table>
+      </div>
+      <div>
+        <Add
+        onAdd={handleAdd}
+        onChange={handleChange}
+        data={formData}
+        />
+      </div>
+      <div>
+        <Search
+        type={handleSearch}
+        onChange2={handleChange2}
+        onClick={handleClick}
+        data2={formData2}
+        depList={departments}/>
+        
+      </div>
+      <div style={{display: "block", position: "absolute", right: "30%", top: "50%"}}>
+      <h2>Search results</h2>
+      <table border="1" id="searchResult" >
+      <MapList list={list2}/>
+      </table>
+      </div>
+      </div>
+      );
+
+}
+const Add =({onAdd, onChange, data}) =>(
+       
+        <div>
+          <h1>Add form</h1>
+          <table border="1">
+            <tr>
+              <td>First Name:</td>
+              <td style={{width: "200px"}}><input style={{width:"200px"}} type="text" id="firstName" name="firstName" value={data.firstName} onChange={onChange} /></td>
+            </tr>
+            <tr>
+              <td>Last name:</td>
+              <td style={{width: "200px"}}><input style={{width:"200px"}} type="text" id="lastName" name="lastName" value={data.lastName} onChange={onChange} /></td>
+            </tr>
+            <tr>
+              <td>Department:</td>
+              <td style={{width: "200px"}}><input style={{width:"200px"}} type="text" id="department" name="department" value={data.department} onChange={onChange} /></td>
+            </tr>
+            <tr>
+              <td>Salary amount:</td>
+              <td style={{width: "200px"}}>
+                <input type="range" style={{width:"150px"}} id="salary" name="salary" min="1000" max="10000" value={data.salary} step="100" onChange={onChange} /> {data.salary} </td>
+            </tr>
+            <tr>
+              <td>Salary currency:</td>
+              <td>
+                <input list="currency" name="currency" style={{width:"200px"}} value={data.currency} onChange={onChange} />
+                <datalist id="currency">
+                <option value="USD"/>
+              </datalist>
+              </td>
+            </tr>
+            <tr>
+              <td colSpan="2" style={{width: "200px"}}>
+                <input type="button" value="Add" onClick={onAdd}/>
+              </td>
+            </tr>
+          </table>
+        </div>
+        )
+const Search = ({type, onChange2, onClick, data2, depList}) =>(
+  <div style={{display: "block", gap: "1em"}}>
+          <h1>Search form</h1>
+          <table border="1">
+            <tr>
+              <td colSpan="2">
+                <select id="searchType" onChange={type} default="Select search type">
+                  
+                  <option value="by_person">By person</option>
+                  <option value="by_department">By department</option>
+                  <option value="by_salary">By salary range</option>
+                  </select>
+              </td>
+            </tr>
+            <tr id="fN" style={{visibility: "visible"}}>
+              <td>First Name:</td>
+              <td><input type="text" id="firstName" name="firstName2" onChange={onChange2} value={data2.firstName2}/></td>
+            </tr>
+            <tr id="lN" style={{visibility: "visible"}}>
+              <td>Last name:</td>
+              <td><input type="text" id="lastName" name="lastName2" onChange={onChange2} value={data2.lastName2}/></td>
+            </tr>
+            <tr id="dp" style={{visibility: "hidden"}}>
+              <td>Department:</td>
+              <td><select  id="department"  name="department2" onChange={onChange2} value={data2.department2}>
+                  <option hidden>Select department</option>
+                {
+                    depList.map((dep)=>(
+                     <option value={dep}>{dep}</option>
+                    ))
+                } </select>
+                </td>
+            </tr>
+            <tr id="sMin" style={{visibility: "hidden"}}>
+              <td>Salary min:</td>
+              <td>
+                <input type="range" id="salary" name="salary_min" min="1000" max="10000" step="100" onChange={onChange2} value={data2.salary_min}/>{data2.salary_min} </td>
+            </tr>
+            <tr id="sMax" style={{visibility: "hidden"}}>
+              <td>Salary max:</td>
+              <td>
+                <input type="range" id="salary" name="salary_max" min="1000" max="10000"  step="100" onChange={onChange2} value={data2.salary_max}/>{data2.salary_max} </td>
+            </tr>
+            <tr>
+              <td colSpan="2" style={{width: "200px"}}>
+                <input type="button" value="Search" onClick={onClick}/>
+              </td>
+            </tr>
+          </table>
+        </div>
+)
+
+
+
+
+ReactDOM.render(
+  
+  <div style={{display: "flex", gap: "10em", flexDirection: "row", flexWrap:"wrap-reverse"}}>
+        <div>
+          <h1>TODO</h1>
+          <TaskList/>
+          <h2>Hints</h2>
+          <ol>
+            <li>
+            yarn global add browser-sync<br/>
+            browser-sync --watch .
+            </li>
+            <li>&lt;datalist&gt;</li>
+          </ol>
+        </div>
+        <div>
+          <WorkerList />
+        </div>
+      </div>,
+    document.getElementById('app')
+);
+
+
+    </script>
+  </body>
+</html>
